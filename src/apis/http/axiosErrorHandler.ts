@@ -4,26 +4,26 @@ import { Toast } from 'vant'
 // http 错误
 interface CodeMessageInterface {
   message: string;
-  handler?: any;
+  handler: any;
 }
 
 /**
  * http 状态码
  */
-interface httpCodeInterface {
+interface HttpCodeInterface{
   [propName: number]: CodeMessageInterface;
 }
 
 /**
- * 定义http 状态码错误信息             
+ * 定义http 状态码错误信息
  */
-export const httpCodeError: httpCodeInterface = {
+export const httpCodeError = {
   400: {
     message: '请求错误'
   },
   401: {
     message: '未授权，请登录',
-    handler: function () {
+    handler: function() {
       Toast.fail(this.message)
     }
   },
@@ -63,7 +63,7 @@ export const httpCodeError: httpCodeInterface = {
  * 处理 http status 错误
  * @param error
  */
-export const responseStatusError = function (error: AxiosError): Promise<AxiosError> {
+export const responseStatusError = function(error: AxiosError): Promise<AxiosError> {
   if (error && error.response) {
     const response = error.response
     const { status } = response

@@ -11,6 +11,7 @@ import { get, post, upload, request } from '../request'
 import { getDemo, postDemo, requestDemo } from '../types/test'
 
 export default {
+
   /**
    * get demo 注意此处options是可选参数，通常我们是不用的，只有需要特殊混入axios options时才需要
    * @param params

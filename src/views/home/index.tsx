@@ -2,7 +2,6 @@ import { ResponseDataInterface } from '@/apis/types/response'
 import { $api } from '@/assets/scripts/utils/sfcGlobalConfig'
 import { inject, reactive, ref, getCurrentInstance, defineComponent, Ref } from 'vue'
 import { useRouter } from 'vue-router'
-
 export default defineComponent({
   name: 'HomeIndex',
   setup() {

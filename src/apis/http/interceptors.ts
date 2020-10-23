@@ -1,7 +1,7 @@
 /**
  * 封装axios 请求拦截和响应拦截
  */
-import Axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios'
+import Axios, { AxiosError, AxiosInstance, AxiosResponse, AxiosPromise } from 'axios'
 import { AxiosRequestConfigInterface, PendingType } from '@/types/axios'
 import { Toast } from 'vant'
 import Cookies from 'js-cookie'
@@ -38,7 +38,7 @@ const removePending = (config: AxiosRequestConfigInterface) => {
  * axios 请求拦截
  * @param axiosRequestConfig
  */
-const axiosRequestInterceptor = function (axiosRequestConfig: AxiosRequestConfigInterface): AxiosRequestConfigInterface {
+const axiosRequestInterceptor = function(axiosRequestConfig: AxiosRequestConfigInterface): AxiosRequestConfigInterface {
   // 此处可以添加全局的loading
   Toast.loading({
     duration: 0, // 持续展示 toast
@@ -67,10 +67,9 @@ const axiosRequestInterceptor = function (axiosRequestConfig: AxiosRequestConfig
  * axios 响应拦截
  * @param axiosResponse
  */
-const axiosResponseInterceptor = function (axiosResponse: AxiosResponse): (AxiosResponse | Promise<AxiosResponse>) {
+const axiosResponseInterceptor = function(axiosResponse: AxiosResponse): (AxiosResponse | Promise<AxiosResponse>) {
   return new Promise((resolve, reject) => {
     Toast.clear()
-
     const { data, config } = axiosResponse
     const code = data?.code
     const requestConfig: AxiosRequestConfigInterface = config as AxiosRequestConfigInterface
@@ -111,7 +110,7 @@ const axiosResponseInterceptor = function (axiosResponse: AxiosResponse): (Axios
  * axios response错误处理
  * @param error
  */
-const axiosResponseErrorHandler = async function (error: AxiosError, axiosInstance: AxiosInstance): (Promise<AxiosResponse | AxiosError>) {
+const axiosResponseErrorHandler = async function(error: AxiosError, axiosInstance: AxiosInstance): (Promise<AxiosResponse | AxiosError>) {
   Toast.clear()
   const response = error.response
   // 超时重新请求
@@ -129,7 +128,7 @@ const axiosResponseErrorHandler = async function (error: AxiosError, axiosInstan
     // 增加重试计数
     config.__retryCount++
     // 创造新的Promise来处理指数后退
-    const backoff = function () {
+    const backoff = function(): Promise<AxiosResponse|boolean> {
       return new Promise((resolve) => {
         setTimeout(() => {
           resolve(true)
@@ -137,8 +136,9 @@ const axiosResponseErrorHandler = async function (error: AxiosError, axiosInstan
       })
     }
     // instance重试请求的Promise
-    const backoffRes = await backoff()
-    return backoffRes && axiosInstance(config)
+    return backoff().then((): AxiosPromise => {
+      return axiosInstance(config)
+    });
   }
 
   // 根据返回的http状态码做不同的处理
@@ -149,7 +149,7 @@ const axiosResponseErrorHandler = async function (error: AxiosError, axiosInstan
  * axios 请求和响应拦截
  * @param AxiosInstance
  */
-export const axiosInterceptor = function (AxiosInstance: AxiosInstance): AxiosInstance {
+export const axiosInterceptor = function(AxiosInstance: AxiosInstance): AxiosInstance {
   // http request 拦截器
   AxiosInstance.interceptors.request.use(config => {
     const conf: AxiosRequestConfigInterface = config as AxiosRequestConfigInterface
