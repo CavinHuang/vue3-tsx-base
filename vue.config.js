@@ -143,5 +143,18 @@ module.exports = {
   // 第三方插件的选项
   pluginOptions: {
     // ...
+  },
+  // 服务配置
+  devServer: {
+    proxy: {
+      // 匹配代理的url标识, 请求到'/proxy_api'下的请求都会被代理到target地址中
+      '/testApi': {
+        target: 'https://api.apiopen.top', // api地址
+        secure: false, // 接受运行在https上的服务
+        pathRewrite: { '^/testApi': '' }, // 路径重写，替换代理url标识Q
+        changeOrigin: true, // needed for virtual hosted sites
+        ws: false // proxy websockets
+      }
+    }
   }
 }
